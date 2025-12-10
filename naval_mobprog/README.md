@@ -1,3 +1,3 @@
 # naval_mobprog
 
-A new Flutter project.
+A new flutter project
