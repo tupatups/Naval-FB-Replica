@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:naval_mobprog/screens/custom_info.dart';
 import '../constants.dart';
 import '../screens/newsfeed_screen.dart';
-import '../screens/notification_screen.dart';
 import '../screens/profile_screen.dart';
 import '../widgets/custom_font.dart';
 
@@ -40,16 +40,16 @@ class _HomeScreenState extends State<HomeScreen> {
         title: CustomFont(
           text: _appBarTitle, 
           fontSize: ScreenUtil().setSp(25),
-          color: FB_PRIMARY,
+          color: FB_DARK_PRIMARY,
           fontFamily: 'Klavika', 
           fontWeight: FontWeight.bold,
         ),
       ),
       body: PageView(
         controller: _pageController,
-        children: const <Widget>[
+        children: <Widget>[
           NewsFeedScreen(),
-          NotificationScreen(),
+          NotificationsScreen(),
           ProfileScreen(), 
         ],
         onPageChanged: (page) {

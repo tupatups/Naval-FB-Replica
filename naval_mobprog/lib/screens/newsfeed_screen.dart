@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/post_card.dart';
+import 'package:naval_mobprog/widgets/post_card.dart';
 
 class NewsFeedScreen extends StatelessWidget {
   const NewsFeedScreen({super.key});
@@ -63,9 +63,8 @@ class NewsFeedScreen extends StatelessWidget {
               PostCard(
                 userName: post['userName'],
                 postContent: post['postContent'],
-                numOfLikes: post['numOfLikes'],
                 date: post['date'],
-                hasImage: post['hasImage'] ?? false, 
+                numOfLikes: post['numOfLikes'],
               ),
               const SizedBox(height: 10), 
             ],
