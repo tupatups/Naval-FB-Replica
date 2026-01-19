@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../constants.dart';
 import '../screens/newsfeed_screen.dart';
 import '../screens/notification_screen.dart';
+import '../screens/profile_screen.dart';
 import '../widgets/custom_font.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -19,11 +20,11 @@ class _HomeScreenState extends State<HomeScreen> {
   String get _appBarTitle {
     switch (_selectedIndex) {
       case 0:
-        return 'LavanBook'; // ENHANCEMENT 4: app name
+        return 'LavanBook'; 
       case 1:
         return 'Notifications';
       case 2:
-        return 'Profile';
+        return 'Christopher Naval';
       default:
         return 'Naval Social';
     }
@@ -49,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: const <Widget>[
           NewsFeedScreen(),
           NotificationScreen(),
-          Center(child: Text("Profile Section")), // placeholder for 3rd screen
+          ProfileScreen(), 
         ],
         onPageChanged: (page) {
           setState(() {
@@ -65,8 +66,6 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifications'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-          // ENHANCEMENT 3: 
-          // BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
         ],
         selectedItemColor: FB_PRIMARY,
         unselectedItemColor: Colors.grey, 

@@ -3,14 +3,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../constants.dart';
 import 'custom_font.dart';
 
-class NewsFeedCard extends StatelessWidget {
+class PostCard extends StatelessWidget {  
   final String userName;
   final String date;
   final String postContent;
   final int numOfLikes;
   final bool hasImage;
 
-  const NewsFeedCard({
+  const PostCard({  
     super.key,
     required this.userName,
     required this.date,
@@ -34,11 +34,8 @@ class NewsFeedCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  // ENHANCEMENT 2:
                   CircleAvatar(
                     radius: ScreenUtil().setSp(20),
-
-                    // AssetImage to load the logo
                     backgroundImage: const AssetImage(
                       'assets/images/TupeDP.jpg',
                     ),
@@ -76,7 +73,6 @@ class NewsFeedCard extends StatelessWidget {
           ),
 
           SizedBox(height: ScreenUtil().setHeight(10)),
-          // ENHANCEMENT 1: Placeholder/Widget for area of images
           if (hasImage)
             Container(
               height: ScreenUtil().setHeight(200),
@@ -90,8 +86,6 @@ class NewsFeedCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(5),
               ),
             ),
-
-          // Like Count Display
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -115,17 +109,15 @@ class NewsFeedCard extends StatelessWidget {
           ),
 
           const Divider(),
-          // ENHANCEMENT 3: Widget Based Like/Comment/Share Buttons
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextButton.icon(
                 onPressed: () {
-                  print('Liked');
                 },
                 icon: const Icon(
                   Icons
-                      .thumb_up_alt_outlined, // Changed to outlined to match FB style
+                      .thumb_up_alt_outlined, 
                   color: Colors.grey,
                 ),
                 label: CustomFont(
@@ -155,10 +147,8 @@ class NewsFeedCard extends StatelessWidget {
             ],
           ),
           const Divider(),
-          // ENHANCEMENT 3 (Cont.): Comment Input Area
           Row(
             children: [
-              // Small user avatar for the comment bar
               CircleAvatar(
                 radius: ScreenUtil().setSp(15),
                 backgroundImage: const AssetImage('assets/images/JoseDP.jpg'),
