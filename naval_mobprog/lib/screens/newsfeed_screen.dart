@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/newsfeed_card.dart';
+import '../widgets/post_card.dart';
 
 class NewsFeedScreen extends StatelessWidget {
   const NewsFeedScreen({super.key});
@@ -60,7 +60,7 @@ class NewsFeedScreen extends StatelessWidget {
           
           return Column(
             children: [
-              NewsFeedCard(
+              PostCard(
                 userName: post['userName'],
                 postContent: post['postContent'],
                 numOfLikes: post['numOfLikes'],
