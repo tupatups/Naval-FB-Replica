@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart'; // NEW: Import provider
+import 'package:provider/provider.dart'; 
 import '../constants.dart';
 import '../widgets/custom_textformfield.dart';
 import '../widgets/custom_inkwell_button.dart';
-import '../providers/user_provider.dart'; // NEW: Import UserProvider
+import '../providers/user_provider.dart'; 
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({super.key});

@@ -4,10 +4,10 @@ import '../widgets/custom_inkwell_button.dart';
 import '../widgets/custom_textformfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart'; // NEW: Import provider
+import 'package:provider/provider.dart'; 
 
 import '../widgets/custom_dialogs.dart';
-import '../providers/user_provider.dart'; // NEW: Import UserProvider
+import '../providers/user_provider.dart'; 
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -24,9 +24,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmpasswordController = TextEditingController();
 
-  // ENHANCEMENT 2: Custom Validation Method
+  
   void register() {
-    // Check if all fields are filled
     if (firstnameController.text.isEmpty ||
         lastnameController.text.isEmpty ||
         mobilenumController.text.isEmpty ||
@@ -40,7 +39,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // Validate first name (no numbers, minimum 2 characters)
+   
     if (firstnameController.text.length < 2) {
       customDialog(
         context,
@@ -59,7 +58,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // Validate last name (no numbers, minimum 2 characters)
+   
     if (lastnameController.text.length < 2) {
       customDialog(
         context,
@@ -78,7 +77,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // Validate mobile number (must be exactly 11 digits)
+    
     if (mobilenumController.text.length != 11) {
       customDialog(
         context,
@@ -88,7 +87,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // Check if mobile number contains only digits
+ 
     if (!RegExp(r'^[0-9]+$').hasMatch(mobilenumController.text)) {
       customDialog(
         context,
@@ -98,7 +97,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // Optional: Check if mobile number starts with 09
     if (!mobilenumController.text.startsWith('09')) {
       customDialog(
         context,
@@ -108,7 +106,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // Validate password requirements
+    
     String password = passwordController.text;
     
     if (password.length < 8) {
@@ -120,7 +118,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // Check for at least one uppercase letter
+
     if (!RegExp(r'[A-Z]').hasMatch(password)) {
       customDialog(
         context,
@@ -130,7 +128,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // Check for at least one lowercase letter
+    
     if (!RegExp(r'[a-z]').hasMatch(password)) {
       customDialog(
         context,
@@ -140,7 +138,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // Check for at least one number
+    
     if (!RegExp(r'[0-9]').hasMatch(password)) {
       customDialog(
         context,
@@ -150,7 +148,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // Check for at least one special character
+    
     if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)) {
       customDialog(
         context,
@@ -170,15 +168,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // If all validations pass, save user and navigate directly to home
-    // NEW: Save the registered username/firstname to provider
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     
-    // You can use either username or combine first name and last name
     String fullName = '${firstnameController.text} ${lastnameController.text}';
     userProvider.setUsername(fullName);
     
-    // Show success dialog and navigate to home
     showDialog(
       context: context,
       builder: (BuildContext context) {

@@ -36,19 +36,18 @@ class CustomTextFormField extends StatefulWidget {
   final fillColor;
   TextInputType keyboardType;
   int maxLength;
-  final bool isPassword; // NEW: Password field indicator
+  final bool isPassword; 
 
   @override
   State<CustomTextFormField> createState() => _CustomTextFormFieldState();
 }
 
 class _CustomTextFormFieldState extends State<CustomTextFormField> {
-  late bool _isPasswordVisible; // NEW: State for password visibility
+  late bool _isPasswordVisible; // state for password visibility
 
   @override
   void initState() {
     super.initState();
-    // Initialize password visibility based on isObscure
     _isPasswordVisible = !widget.isObscure;
   }
 
@@ -58,7 +57,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
       validator: widget.validator,
       onSaved: widget.onSaved,
       controller: widget.controller,
-      obscureText: widget.isPassword ? !_isPasswordVisible : widget.isObscure, // NEW: Toggle based on state
+      obscureText: widget.isPassword ? !_isPasswordVisible : widget.isObscure, 
       keyboardType: widget.keyboardType,
       inputFormatters: [
         LengthLimitingTextInputFormatter(widget.maxLength),
@@ -71,7 +70,6 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         contentPadding: EdgeInsets.fromLTRB(
             widget.width, widget.height, widget.width, widget.height),
         focusColor: Colors.black12,
-        // NEW: Add suffix icon for password toggle
         suffixIcon: widget.isPassword
             ? IconButton(
                 icon: Icon(

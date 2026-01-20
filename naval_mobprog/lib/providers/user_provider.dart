@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-// User Provider to manage logged-in user data
 class UserProvider extends ChangeNotifier {
   String _username = 'Christopher Naval'; // Default username
   

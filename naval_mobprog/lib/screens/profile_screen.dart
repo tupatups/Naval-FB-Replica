@@ -202,7 +202,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Enhancement 3: Build Posts Section with dynamic username
   Widget _buildPostsSection(String profileName) {
     return ListView(
       padding: EdgeInsets.all(ScreenUtil().setWidth(10)),
