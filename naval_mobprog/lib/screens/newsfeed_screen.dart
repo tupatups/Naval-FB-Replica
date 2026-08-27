@@ -1,73 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:naval_mobprog/widgets/post_card.dart';
+import '../widgets/post_card.dart';
+import '../services/post_service.dart';
+import '../models/post.dart';
 
-class NewsFeedScreen extends StatelessWidget {
-  const NewsFeedScreen({super.key});
-  
-  final List<Map<String, dynamic>> _posts = const [
-    {
-      'userName': 'Christopher Naval',
-      'postContent': 'Bossing! may gising pa ba?',
-      'numOfLikes': 150,
-      'date': 'Just now',
-      'hasImage': false,
-    },
-    {
-      'userName': 'Christopher Naval',
-      'postContent': 'Bili siya sa canteen.',
-      'numOfLikes': 42,
-      'date': '15 mins ago',
-      'hasImage': true,
-    },
-    {
-      'userName': 'Christopher Naval',
-      'postContent': 'Bakal ako.',
-      'numOfLikes': 89,
-      'date': '1 hr ago',
-      'hasImage': true,
-    },
-    {
-      'userName': 'Christopher Naval',
-      'postContent': 'Dito ako Sampaloc, Manila. 500 cash sa makakakita sakin!!',
-      'numOfLikes': 200,
-      'date': '3 hrs ago',
-      'hasImage': false,
-    },
-    {
-      'userName': 'Christopher Naval',
-      'postContent': 'Looking right because you left me.',
-      'numOfLikes': 75,
-      'date': 'Yesterday',
-      'hasImage': true,
-    },
-    {
-      'userName': 'Christopher Naval',
-      'postContent': 'Lodi ko yan',
-      'numOfLikes': 120,
-      'date': '2 days ago',
-      'hasImage': false,
-    },
-  ];
+class NewsfeedScreen extends StatefulWidget {
+  const NewsfeedScreen({super.key});
+
+  @override
+  State<NewsfeedScreen> createState() => _NewsfeedScreenState();
+}
+
+class _NewsfeedScreenState extends State<NewsfeedScreen> {
+  final PostService _postService = PostService();
+  late Future<List<Post>> _postsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _postsFuture = _postService.getPosts(); // feth data from dummyjson
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.grey[200], 
-      child: ListView.builder(
-        itemCount: _posts.length,
-        itemBuilder: (context, index) {
-          final post = _posts[index];
-          
-          return Column(
-            children: [
-              PostCard(
-                userName: post['userName'],
-                postContent: post['postContent'],
-                date: post['date'],
-                numOfLikes: post['numOfLikes'],
-              ),
-              const SizedBox(height: 10), 
-            ],
+    return SafeArea(
+      child: FutureBuilder<List<Post>>(
+        future: _postsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No posts found.'));
+          }
+
+          final posts = snapshot.data!;
+
+          return ListView.builder(
+            itemCount: posts.length,
+            itemBuilder: (context, index) {
+              final post = posts[index];
+
+              return PostCard(
+                postId: post.id,
+                userName:
+                    'User ${post.userId}', 
+                postContent: post.body,
+                date: 'Just now',
+                numOfLikes: post.likes,
+                profileImageUrl:
+                    'https://img.icons8.com/?size=100&id=NPW07SMh7Aco&format=png&color=000000',
+              );
+            },
           );
         },
       ),

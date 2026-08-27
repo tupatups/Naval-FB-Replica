@@ -4,14 +4,17 @@ publish_to: 'none'
 version: 0.1.0
 
 environment:
-  sdk: ^3.10.1 
+  sdk: ^3.10.0
 
 dependencies:
+  cached_network_image: ^3.4.1
+  carousel_slider: ^5.1.1
   flutter:
     sdk: flutter
-
   flutter_screenutil: ^5.9.3
-  provider: ^6.1.1
+  provider: ^6.0.0
+  shared_preferences: ^2.5.5
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -19,7 +22,12 @@ dev_dependencies:
 
 flutter:
   assets:
-    - assets/icons/
     - assets/images/
-    - assets/images/golden.jpg
+  fonts:
+    - family: Klavika
+      fonts:
+        - asset: assets/fonts/KlavikaBoldBold.otf
+    - family: Frutiger
+      fonts:
+        - asset: assets/fonts/FrutigerLTStd-Roman.otf
   uses-material-design: true

@@ -1,265 +1,191 @@
-import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter/material.dart';
+import '../screens/detail_screen.dart';
 import '../constants.dart';
 import 'custom_font.dart';
-import '../screens/detail_screen.dart'; 
 
-class PostCard extends StatelessWidget {  
+// ignore: must_be_immutable
+class PostCard extends StatefulWidget {
+  final int postId; // NEW parameter
   final String userName;
-  final String date;
   final String postContent;
-  final int numOfLikes;
-  final bool hasImage;
+  final String date;
+  final String imageUrl;
+  int numOfLikes;
+  final String profileImageUrl;
+  final String adsMarket;
 
-  const PostCard({  
+  PostCard({
     super.key,
+    required this.postId, // Required here
     required this.userName,
-    required this.date,
     required this.postContent,
-    required this.numOfLikes,
-    this.hasImage = false,
+    required this.date,
+    this.imageUrl = '',
+    this.numOfLikes = 0,
+    this.profileImageUrl = '',
+    this.adsMarket = '',
   });
 
   @override
+  State<PostCard> createState() => _PostCardState();
+}
+
+class _PostCardState extends State<PostCard> {
+  bool isLiked = false; // Added to track like state locally
+
+  @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => DetailScreen(
-              userName: userName,
-              postContent: postContent, 
-              date: date,
-              numOfLikes: numOfLikes,
-              imageUrl: hasImage ? 'assets/images/JosePost.jpg' : '',
-              profileImageUrl: 'assets/images/TupeDP.jpg', 
+              postId: widget.postId, // Pass it to detail screen
+              userName: widget.userName,
+              postContent: widget.postContent,
+              date: widget.date,
+              numOfLikes: widget.numOfLikes,
+              imageUrl: widget.imageUrl,
+              profileImageUrl: widget.profileImageUrl,
             ),
           ),
         );
       },
-      child: Container(
-        margin: EdgeInsets.symmetric(
-          horizontal: ScreenUtil().setWidth(10),
-          vertical: ScreenUtil().setHeight(8),
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 1,
-              blurRadius: 6,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
+      child: Card(
+        color: Colors.white,
+        margin: EdgeInsets.all(ScreenUtil().setSp(10)),
         child: Padding(
-          padding: EdgeInsets.all(ScreenUtil().setSp(15)),
+          padding: EdgeInsets.all(ScreenUtil().setSp(10)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header Row
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: ScreenUtil().setSp(22),
-                        backgroundImage: const AssetImage(
-                          'assets/images/TupeDP.jpg',
+                  (widget.profileImageUrl == '')
+                      ? const Icon(Icons.person)
+                      : ClipOval(
+                          child: CachedNetworkImage(
+                            fit: BoxFit.cover,
+                            height: 40,
+                            width: 40,
+                            imageUrl: widget.profileImageUrl,
+                            progressIndicatorBuilder:
+                                (context, url, downloadProgress) =>
+                                    CircularProgressIndicator(
+                                      color: FB_DARK_PRIMARY,
+                                      value: downloadProgress.progress,
+                                    ),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error, size: 40.sp),
+                          ),
                         ),
+                  SizedBox(width: ScreenUtil().setWidth(13)),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomFont(
+                        text: widget.userName,
+                        fontSize: ScreenUtil().setSp(15),
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
                       ),
-                      SizedBox(width: ScreenUtil().setWidth(10)),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           CustomFont(
-                            text: userName,
-                            fontSize: ScreenUtil().setSp(17),
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black,
+                            text: widget.date,
+                            fontSize: ScreenUtil().setSp(12),
+                            color: Colors.grey,
                           ),
-                          Row(
-                            children: [
-                              CustomFont(
-                                text: date,
-                                fontSize: ScreenUtil().setSp(13),
-                                color: Colors.grey.shade600,
-                              ),
-                              SizedBox(width: ScreenUtil().setWidth(4)),
-                              Icon(
-                                Icons.public,
-                                size: ScreenUtil().setSp(14),
-                                color: Colors.grey.shade600,
-                              ),
-                            ],
+                          SizedBox(width: ScreenUtil().setWidth(3)),
+                          Icon(
+                            Icons.public,
+                            color: Colors.grey,
+                            size: ScreenUtil().setSp(15),
                           ),
                         ],
                       ),
                     ],
                   ),
-                  Icon(Icons.more_horiz, color: Colors.grey.shade700, size: 24),
+                  Spacer(),
+                  Icon(Icons.more_horiz),
                 ],
               ),
-
-              SizedBox(height: ScreenUtil().setHeight(12)),
-
-              // Post Content Text
+              SizedBox(height: ScreenUtil().setHeight(5)),
               CustomFont(
-                text: postContent,
-                fontSize: ScreenUtil().setSp(15),
-                color: Colors.black87,
-                fontWeight: FontWeight.w400,
+                text: widget.postContent,
+                fontSize: ScreenUtil().setSp(14),
+                color: Colors.black,
               ),
-
-              SizedBox(height: ScreenUtil().setHeight(12)),
-              
-              if (hasImage)
-                Container(
-                  height: ScreenUtil().setHeight(200),
-                  width: double.infinity,
-                  margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(12)),
-                  decoration: BoxDecoration(
-                    image: const DecorationImage(
-                      image: AssetImage('assets/images/JosePost.jpg'),
-                      fit: BoxFit.cover,
-                    ),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+              SizedBox(height: ScreenUtil().setHeight(5)),
+              if (widget.imageUrl != '')
+                CachedNetworkImage(
+                  imageUrl: widget.imageUrl,
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      Center(
+                        child: CircularProgressIndicator(
+                          color: FB_DARK_PRIMARY,
+                          value: downloadProgress.progress,
+                        ),
+                      ),
+                  errorWidget: (context, url, error) =>
+                      Icon(Icons.error, size: 100.sp),
                 ),
-              
-              // Likes and Comments Row
+              SizedBox(height: ScreenUtil().setHeight(10)),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: FB_PRIMARY,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.thumb_up,
-                          size: 12,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      CustomFont(
-                        text: numOfLikes.toString(),
-                        fontSize: 14,
-                        color: Colors.grey.shade700,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ],
+                  TextButton.icon(
+                    onPressed: () {
+                      // Clickable Like functionality
+                      setState(() {
+                        if (isLiked) {
+                          widget.numOfLikes--;
+                        } else {
+                          widget.numOfLikes++;
+                        }
+                        isLiked = !isLiked;
+                      });
+                    },
+                    icon: Icon(
+                      isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
+                      color: FB_DARK_PRIMARY,
+                    ),
+                    label: CustomFont(
+                      text: (widget.numOfLikes == 0)
+                          ? 'Like'
+                          : widget.numOfLikes.toString(),
+                      fontSize: ScreenUtil().setSp(12),
+                      color: FB_DARK_PRIMARY,
+                    ),
                   ),
-                  CustomFont(
-                    text: "42 Comments  5 Shares",
-                    fontSize: 13,
-                    color: Colors.grey.shade600,
-                    fontWeight: FontWeight.w500,
+                  TextButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.comment, color: FB_DARK_PRIMARY),
+                    label: CustomFont(
+                      text: 'Comment',
+                      fontSize: ScreenUtil().setSp(12),
+                      color: FB_DARK_PRIMARY,
+                    ),
                   ),
-                ],
-              ),
-
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(8)),
-                child: Divider(thickness: 0.8, color: Colors.grey.shade300),
-              ),
-
-              // Action Buttons Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildActionButton(
-                    icon: Icons.thumb_up_alt_outlined,
-                    label: 'Like',
-                    onTap: () {},
-                  ),
-                  _buildActionButton(
-                    icon: Icons.chat_bubble_outline,
-                    label: 'Comment',
-                    onTap: () {},
-                  ),
-                  _buildActionButton(
-                    icon: Icons.redo,
-                    label: 'Share',
-                    onTap: () {},
-                  ),
-                ],
-              ),
-
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(8)),
-                child: Divider(thickness: 0.8, color: Colors.grey.shade300),
-              ),
-
-              // Comment Input Row
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: ScreenUtil().setSp(16),
-                    backgroundImage: const AssetImage('assets/images/JoseDP.jpg'),
-                  ),
-                  SizedBox(width: ScreenUtil().setWidth(10)),
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: ScreenUtil().setSp(15),
-                        vertical: ScreenUtil().setSp(10),
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: CustomFont(
-                        text: 'Write a comment...',
-                        fontSize: ScreenUtil().setSp(13),
-                        color: Colors.grey.shade600,
-                      ),
+                  TextButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.redo, color: FB_DARK_PRIMARY),
+                    label: CustomFont(
+                      text: 'Share',
+                      fontSize: ScreenUtil().setSp(12),
+                      color: FB_DARK_PRIMARY,
                     ),
                   ),
                 ],
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActionButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: ScreenUtil().setWidth(8),
-          vertical: ScreenUtil().setHeight(6),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: Colors.grey.shade700,
-              size: ScreenUtil().setSp(20),
-            ),
-            SizedBox(width: ScreenUtil().setWidth(6)),
-            CustomFont(
-              text: label,
-              fontSize: ScreenUtil().setSp(14),
-              color: Colors.grey.shade700,
-              fontWeight: FontWeight.w600,
-            ),
-          ],
         ),
       ),
     );

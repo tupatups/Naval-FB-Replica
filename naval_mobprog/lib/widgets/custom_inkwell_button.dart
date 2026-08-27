@@ -10,9 +10,9 @@ class CustomInkwellButton extends StatelessWidget {
   final double fontSize;
   final String buttonName;
   final Icon icon;
-  FontWeight fontWeight;
-  Color bgColor;
-  Color fontColor;
+  final FontWeight fontWeight;
+  final Color bgColor;
+  final Color fontColor;
 
   CustomInkwellButton(
       {super.key,
@@ -22,7 +22,7 @@ class CustomInkwellButton extends StatelessWidget {
       this.buttonName = '',
       this.bgColor = FB_DARK_PRIMARY,
       this.fontColor = Colors.white,
-      this.fontSize = 1,
+      this.fontSize = 1.0,
       this.icon = const Icon(null),
       this.fontWeight = FontWeight.normal});
 

@@ -11,6 +11,7 @@ class CustomFont extends StatelessWidget {
     this.textAlign = TextAlign.left,
     this.letterSpacing = 0,
     this.fontStyle = FontStyle.normal,
+    this.overflow = TextOverflow.clip,
   });
 
   final String text;
@@ -20,11 +21,13 @@ class CustomFont extends StatelessWidget {
   final TextAlign textAlign;
   final String fontFamily;
   final FontStyle fontStyle;
+  final TextOverflow overflow;
   @override
   Widget build(BuildContext context) {
     return Text(
       text,
       textAlign: textAlign,
+      overflow: overflow,
       style: TextStyle(
         fontFamily: fontFamily,
         fontSize: fontSize,

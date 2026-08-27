@@ -14,7 +14,7 @@ class CustomTextFormField extends StatefulWidget {
     this.isObscure = false,
     required this.fontSize,
     required this.fontColor,
-    this.hintTextSize = 12,
+    this.hintTextSize = 12.0,
     this.hintText = '',
     this.fillColor = Colors.black12,
     required this.height,
@@ -28,11 +28,11 @@ class CustomTextFormField extends StatefulWidget {
   final onSaved;
   final controller;
   final bool isObscure;
-  final fontSize;
+  final double fontSize;
   final fontColor;
   final double height, width;
-  final hintTextSize;
-  final hintText;
+  final double hintTextSize;
+  final String hintText;
   final fillColor;
   TextInputType keyboardType;
   int maxLength;
