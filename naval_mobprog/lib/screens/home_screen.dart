@@ -1,56 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../constants.dart';
-import '../screens/newsfeed_screen.dart';
-import '../screens/notification_screen.dart';
-import '../screens/profile_screen.dart';
-import '../widgets/custom_font.dart';
+import 'package:naval_mobprog/constants.dart';
+import 'package:naval_mobprog/screens/newsfeed_screen.dart';
+import 'package:naval_mobprog/screens/notification_screen.dart';
+import 'package:naval_mobprog/screens/profile_screen.dart';
+import 'package:naval_mobprog/widgets/custom_font.dart';
+import 'package:naval_mobprog/screens/settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String? username;
+  const HomeScreen({super.key, this.username});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  String title = 'FishBook';
   final PageController _pageController = PageController();
-
-  String get _appBarTitle {
-    switch (_selectedIndex) {
-      case 0:
-        return 'LavanBook'; 
-      case 1:
-        return 'Notifications';
-      case 2:
-        return 'Christopher Naval';
-      default:
-        return 'Naval Social';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
         shadowColor: FB_TEXT_COLOR_WHITE,
         elevation: 2,
         title: CustomFont(
-          text: _appBarTitle, 
+          text: _setTitle(_selectedIndex),
           fontSize: ScreenUtil().setSp(25),
           color: FB_PRIMARY,
-          fontFamily: 'Klavika', 
-          fontWeight: FontWeight.bold,
+          fontFamily: 'Klavika',
         ),
+        // 2. Add the Settings action button here
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings, color: FB_PRIMARY),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+            },
+          ),
+        ],
       ),
       body: PageView(
         controller: _pageController,
-        children: const <Widget>[
-          NewsFeedScreen(),
-          NotificationScreen(),
-          ProfileScreen(), 
+        children: <Widget>[
+          const NewsfeedScreen(),
+          const NotificationScreen(),
+          ProfileScreen(username: widget.username),
         ],
         onPageChanged: (page) {
           setState(() {
@@ -58,17 +58,20 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         },
       ),
+
       bottomNavigationBar: BottomNavigationBar(
-        showSelectedLabels: false, 
+        showSelectedLabels: false,
         showUnselectedLabels: false,
         onTap: _onTappedBar,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifications'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications),
+            label: 'Notifications',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'profile'),
         ],
         selectedItemColor: FB_PRIMARY,
-        unselectedItemColor: Colors.grey, 
         currentIndex: _selectedIndex,
       ),
     );
@@ -78,6 +81,28 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedIndex = value;
     });
-    _pageController.jumpToPage(value);
+    _pageController.animateToPage(
+      value,
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  String _setTitle(int value) {
+    if (value == 1) {
+      return 'Notifications';
+    }
+
+    if (value == 2) {
+      return widget.username ?? 'Profile';
+    }
+
+    return 'FishBook';
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 }

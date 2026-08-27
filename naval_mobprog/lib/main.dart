@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'screens/home_screen.dart';
-import 'screens/newsfeed_screen.dart';
+import 'package:naval_mobprog/screens/login_screen.dart';
+import 'package:naval_mobprog/screens/register_screen.dart';
+import 'package:naval_mobprog/screens/splash_screen.dart';
+import 'package:naval_mobprog/screens/home_screen.dart';
+import 'package:naval_mobprog/screens/newsfeed_screen.dart';
 
-void main() => runApp(const NavalFacebook());
+void main() {
+  runApp(const MainApp());
+}
 
-class NavalFacebook extends StatelessWidget {
-  const NavalFacebook({super.key});
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,11 +22,14 @@ class NavalFacebook extends StatelessWidget {
       builder: (_, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'Facebook Replication',
-          initialRoute: '/home',
+          title: 'FishBook',
+          initialRoute: '/',
           routes: {
-            '/newsfeed': (context) => const NewsFeedScreen(),
+            '/': (context) => const SplashScreen(),
             '/home': (context) => const HomeScreen(),
+            '/newsfeed': (context) => const NewsfeedScreen(),
+            '/login': (context) => const LoginScreen(),
+            '/register': (context) => const RegisterScreen(),
           },
         );
       },

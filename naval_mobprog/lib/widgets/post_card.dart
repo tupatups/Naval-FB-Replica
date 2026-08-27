@@ -1,181 +1,192 @@
-import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter/material.dart';
+import '../screens/detail_screen.dart';
 import '../constants.dart';
 import 'custom_font.dart';
 
-class PostCard extends StatelessWidget {  
+// ignore: must_be_immutable
+class PostCard extends StatefulWidget {
+  final int postId; // NEW parameter
   final String userName;
-  final String date;
   final String postContent;
-  final int numOfLikes;
-  final bool hasImage;
+  final String date;
+  final String imageUrl;
+  int numOfLikes;
+  final String profileImageUrl;
+  final String adsMarket;
 
-  const PostCard({  
+  PostCard({
     super.key,
+    required this.postId, // Required here
     required this.userName,
-    required this.date,
     required this.postContent,
-    required this.numOfLikes,
-    this.hasImage = false,
+    required this.date,
+    this.imageUrl = '',
+    this.numOfLikes = 0,
+    this.profileImageUrl = '',
+    this.adsMarket = '',
   });
 
   @override
+  State<PostCard> createState() => _PostCardState();
+}
+
+class _PostCardState extends State<PostCard> {
+  bool isLiked = false; // Added to track like state locally
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(10)),
-      padding: EdgeInsets.all(ScreenUtil().setSp(15)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailScreen(
+              postId: widget.postId, // Pass it to detail screen
+              userName: widget.userName,
+              postContent: widget.postContent,
+              date: widget.date,
+              numOfLikes: widget.numOfLikes,
+              imageUrl: widget.imageUrl,
+              profileImageUrl: widget.profileImageUrl,
+            ),
+          ),
+        );
+      },
+      child: Card(
+        color: Colors.white,
+        margin: EdgeInsets.all(ScreenUtil().setSp(10)),
+        child: Padding(
+          padding: EdgeInsets.all(ScreenUtil().setSp(10)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  CircleAvatar(
-                    radius: ScreenUtil().setSp(20),
-                    backgroundImage: const AssetImage(
-                      'assets/images/TupeDP.jpg',
-                    ),
-                  ),
-                  SizedBox(width: ScreenUtil().setWidth(10)),
+                  (widget.profileImageUrl == '')
+                      ? const Icon(Icons.person)
+                      : ClipOval(
+                          child: CachedNetworkImage(
+                            fit: BoxFit.cover,
+                            height: 40,
+                            width: 40,
+                            imageUrl: widget.profileImageUrl,
+                            progressIndicatorBuilder:
+                                (context, url, downloadProgress) =>
+                                    CircularProgressIndicator(
+                                      color: FB_DARK_PRIMARY,
+                                      value: downloadProgress.progress,
+                                    ),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error, size: 40.sp),
+                          ),
+                        ),
+                  SizedBox(width: ScreenUtil().setWidth(13)),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       CustomFont(
-                        text: userName,
-                        fontSize: ScreenUtil().setSp(16),
-                        fontWeight: FontWeight.bold,
+                        text: widget.userName,
+                        fontSize: ScreenUtil().setSp(15),
                         color: Colors.black,
+                        fontWeight: FontWeight.bold,
                       ),
-                      CustomFont(
-                        text: date,
-                        fontSize: ScreenUtil().setSp(12),
-                        color: Colors.grey,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          CustomFont(
+                            text: widget.date,
+                            fontSize: ScreenUtil().setSp(12),
+                            color: Colors.grey,
+                          ),
+                          SizedBox(width: ScreenUtil().setWidth(3)),
+                          Icon(
+                            Icons.public,
+                            color: Colors.grey,
+                            size: ScreenUtil().setSp(15),
+                          ),
+                        ],
                       ),
                     ],
                   ),
+                  Spacer(),
+                  Icon(Icons.more_horiz),
                 ],
               ),
-              const Icon(Icons.more_horiz),
-            ],
-          ),
-
-          SizedBox(height: ScreenUtil().setHeight(10)),
-
-          // Post Content Text
-          CustomFont(
-            text: postContent,
-            fontSize: ScreenUtil().setSp(14),
-            color: Colors.black,
-          ),
-
-          SizedBox(height: ScreenUtil().setHeight(10)),
-          if (hasImage)
-            Container(
-              height: ScreenUtil().setHeight(200),
-              width: double.infinity,
-              margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(10)),
-              decoration: BoxDecoration(
-                image: const DecorationImage(
-                  image: AssetImage('assets/images/JosePost.jpg'),
-                  fit: BoxFit.cover,
-                ),
-                borderRadius: BorderRadius.circular(5),
-              ),
-            ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.thumb_up, size: 16, color: FB_PRIMARY),
-                  SizedBox(width: 5),
-                  CustomFont(
-                    text: numOfLikes.toString(),
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
-                ],
-              ),
+              SizedBox(height: ScreenUtil().setHeight(5)),
               CustomFont(
-                text: "42 Comments  5 Shares",
-                fontSize: 12,
-                color: Colors.grey,
+                text: widget.postContent,
+                fontSize: ScreenUtil().setSp(14),
+                color: Colors.black,
               ),
-            ],
-          ),
-
-          const Divider(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextButton.icon(
-                onPressed: () {
-                },
-                icon: const Icon(
-                  Icons
-                      .thumb_up_alt_outlined, 
-                  color: Colors.grey,
+              SizedBox(height: ScreenUtil().setHeight(5)),
+              if (widget.imageUrl != '')
+                CachedNetworkImage(
+                  imageUrl: widget.imageUrl,
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      Center(
+                        child: CircularProgressIndicator(
+                          color: FB_DARK_PRIMARY,
+                          value: downloadProgress.progress,
+                        ),
+                      ),
+                  errorWidget: (context, url, error) =>
+                      Icon(Icons.error, size: 100.sp),
                 ),
-                label: CustomFont(
-                  text: 'Like',
-                  fontSize: ScreenUtil().setSp(12),
-                  color: Colors.grey,
-                ),
-              ),
-              TextButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.comment_outlined, color: Colors.grey),
-                label: CustomFont(
-                  text: 'Comment',
-                  fontSize: ScreenUtil().setSp(12),
-                  color: Colors.grey,
-                ),
-              ),
-              TextButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.share_outlined, color: Colors.grey),
-                label: CustomFont(
-                  text: 'Share',
-                  fontSize: ScreenUtil().setSp(12),
-                  color: Colors.grey,
-                ),
-              ),
-            ],
-          ),
-          const Divider(),
-          Row(
-            children: [
-              CircleAvatar(
-                radius: ScreenUtil().setSp(15),
-                backgroundImage: const AssetImage('assets/images/JoseDP.jpg'),
-              ),
-              SizedBox(width: ScreenUtil().setWidth(10)),
-              Container(
-                padding: EdgeInsets.fromLTRB(ScreenUtil().setSp(10), 0, 0, 0),
-                alignment: Alignment.centerLeft,
-                height: ScreenUtil().setHeight(35), // Adjusted slightly for fit
-                width: ScreenUtil().setWidth(
-                  250,
-                ), // Adjusted to fit screen width
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(ScreenUtil().setSp(20)),
+              SizedBox(height: ScreenUtil().setHeight(10)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton.icon(
+                    onPressed: () {
+                      // Clickable Like functionality
+                      setState(() {
+                        if (isLiked) {
+                          widget.numOfLikes--;
+                        } else {
+                          widget.numOfLikes++;
+                        }
+                        isLiked = !isLiked;
+                      });
+                    },
+                    icon: Icon(
+                      isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
+                      color: FB_DARK_PRIMARY,
+                    ),
+                    label: CustomFont(
+                      text: (widget.numOfLikes == 0)
+                          ? 'Like'
+                          : widget.numOfLikes.toString(),
+                      fontSize: ScreenUtil().setSp(12),
+                      color: FB_DARK_PRIMARY,
+                    ),
                   ),
-                ),
-                child: CustomFont(
-                  text: 'Write a comment...',
-                  fontSize: ScreenUtil().setSp(12),
-                  color: Colors.grey,
-                ),
+                  TextButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.comment, color: FB_DARK_PRIMARY),
+                    label: CustomFont(
+                      text: 'Comment',
+                      fontSize: ScreenUtil().setSp(12),
+                      color: FB_DARK_PRIMARY,
+                    ),
+                  ),
+                  TextButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.redo, color: FB_DARK_PRIMARY),
+                    label: CustomFont(
+                      text: 'Share',
+                      fontSize: ScreenUtil().setSp(12),
+                      color: FB_DARK_PRIMARY,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

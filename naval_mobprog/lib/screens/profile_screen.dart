@@ -1,35 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../constants.dart';
-import '../widgets/custom_font.dart';
 import '../widgets/custom_button.dart';
+import '../widgets/custom_font.dart';
 import '../widgets/post_card.dart';
+import '../models/post.dart';
+import '../services/post_service.dart';
+import 'settings_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final String? username;
+  const ProfileScreen({super.key, this.username});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // Image 
-final String profileImageUrl = 'assets/images/TupeDP.jpg'; 
-final String coverImageUrl = 'assets/images/JosePost.jpg';
+  final PostService _postService = PostService();
+  late Future<List<Post>> _userPostsFuture;
 
-  // Enhancement 1
-  final String profileName = 'Christopher Naval';
+  String displayName = 'Loading...';
+  String profileImageUrl = '';
+  int? userId;
 
-  // Enhancement 2
-  final String followersCount = '1.2M';
-  final String followingCount = '328';
+  @override
+  void initState() {
+    super.initState();
+    _userPostsFuture = Future.value([]); 
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      // Use user ID 2 for fetching posts
+      userId = 2;
+      String fName = prefs.getString('firstName') ?? '';
+      String lName = prefs.getString('lastName') ?? '';
+      displayName = fName.isNotEmpty
+          ? '$fName $lName'
+          : (widget.username ?? 'User Profile');
+
+      // Use local asset image for profile
+      profileImageUrl = 'assets/images/TupeDP.jpg';
+
+      if (userId != null) {
+        _userPostsFuture = _postService.getUserPosts(userId!);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3,
       child: Container(
-        color: Colors.white,
+        color: const Color.fromRGBO(255, 255, 255, 1),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,14 +67,12 @@ final String coverImageUrl = 'assets/images/JosePost.jpg';
               Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  Container(
+                  SizedBox(
                     height: 200,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      image: DecorationImage(
-                        image: AssetImage(coverImageUrl),
-                        fit: BoxFit.cover,
-                      ),
+                    width: double.infinity,
+                    child: Image.asset(
+                      'assets/images/golden.jpg',
+                      fit: BoxFit.cover,
                     ),
                   ),
                   Positioned(
@@ -55,7 +83,17 @@ final String coverImageUrl = 'assets/images/JosePost.jpg';
                       children: [
                         CircleAvatar(
                           radius: 50,
-                          backgroundImage: AssetImage(profileImageUrl),
+                          backgroundColor: Colors.grey[300],
+                          child: ClipOval(
+                            child: profileImageUrl.isEmpty
+                                ? const Icon(Icons.person, size: 50)
+                                : Image.asset(
+                                    profileImageUrl,
+                                    fit: BoxFit.cover,
+                                    height: 100,
+                                    width: 100,
+                                  ),
+                          ),
                         ),
                         Positioned(
                           bottom: 0,
@@ -77,28 +115,28 @@ final String coverImageUrl = 'assets/images/JosePost.jpg';
               ),
               SizedBox(height: ScreenUtil().setHeight(55)),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(20)),
+                padding: EdgeInsets.symmetric(
+                  horizontal: ScreenUtil().setWidth(20),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Enhancement 1
                     CustomFont(
-                      text: profileName,
+                      text: displayName,
                       fontWeight: FontWeight.bold,
                       fontSize: ScreenUtil().setSp(20),
                       color: Colors.black,
                     ),
                     SizedBox(height: ScreenUtil().setHeight(5)),
-                    // Enhancement 2
                     Row(
                       children: [
                         CustomFont(
-                          text: followersCount,
+                          text: '100M',
                           fontSize: ScreenUtil().setSp(15),
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),
-                        SizedBox(width: ScreenUtil().setWidth(10)),
+                        SizedBox(width: ScreenUtil().setWidth(5)),
                         CustomFont(
                           text: 'followers',
                           fontSize: ScreenUtil().setSp(15),
@@ -106,19 +144,13 @@ final String coverImageUrl = 'assets/images/JosePost.jpg';
                           fontWeight: FontWeight.w100,
                         ),
                         SizedBox(width: ScreenUtil().setWidth(5)),
-                        Icon(
-                          Icons.circle,
-                          size: ScreenUtil().setSp(5),
-                          color: Colors.grey,
-                        ),
-                        SizedBox(width: ScreenUtil().setWidth(5)),
                         CustomFont(
-                          text: followingCount,
+                          text: '56',
                           fontSize: ScreenUtil().setSp(15),
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),
-                        SizedBox(width: ScreenUtil().setWidth(10)),
+                        SizedBox(width: ScreenUtil().setWidth(5)),
                         CustomFont(
                           text: 'following',
                           fontSize: ScreenUtil().setSp(15),
@@ -127,18 +159,32 @@ final String coverImageUrl = 'assets/images/JosePost.jpg';
                         ),
                       ],
                     ),
-                    SizedBox(height: ScreenUtil().setHeight(10)),
+                    SizedBox(height: ScreenUtil().setSp(10)),
                     Row(
                       children: [
-                        CustomButton(
-                          buttonName: 'Follow',
-                          onPressed: () {},
-                        ),
+                        CustomButton(buttonName: 'Follow', onPressed: () {}),
                         SizedBox(width: ScreenUtil().setWidth(10)),
                         CustomButton(
                           buttonName: 'Message',
                           onPressed: () {},
                           buttonType: 'outlined',
+                        ),
+                        SizedBox(width: ScreenUtil().setWidth(10)),
+
+                        // Settings Button added here
+                        IconButton(
+                          icon: const Icon(
+                            Icons.settings,
+                            color: Colors.black87,
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SettingsScreen(),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -176,12 +222,212 @@ final String coverImageUrl = 'assets/images/JosePost.jpg';
                 height: ScreenUtil().setHeight(2000),
                 child: TabBarView(
                   children: [
-                    // Enhancement 3: Posts Section 
-                    _buildPostsSection(),
-                    // Enhancement 4: About Section 
-                    _buildAboutSection(),
-                    // Enhancement 5: Photos Section 
-                    _buildPhotosSection(),
+                    // Dynamic Posts Tab
+                    FutureBuilder<List<Post>>(
+                      future: _userPostsFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: FB_DARK_PRIMARY,
+                            ),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Center(child: Text('Error loading posts.'));
+                        } else if (!snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
+                          return Center(child: Text('No posts found.'));
+                        }
+
+                        final posts = snapshot.data!;
+
+                        
+                        return ListView.builder(
+                          physics:
+                              const NeverScrollableScrollPhysics(), 
+                          shrinkWrap: true,
+                          itemCount: posts.length,
+                          itemBuilder: (context, index) {
+                            final post = posts[index];
+                            return PostCard(
+                              postId: post.id,
+                              userName: displayName,
+                              postContent: post.body,
+                              date:
+                                  'Just now', 
+                              numOfLikes: post.likes,
+                              profileImageUrl: profileImageUrl,
+                            );
+                          },
+                        );
+                      },
+                    ),
+
+                    // About Tab (Unchanged)
+                    ListView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        Column(
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.fromLTRB(
+                                16,
+                                20,
+                                16,
+                                12,
+                              ),
+                              child: CustomFont(
+                                text: 'Details',
+                                fontSize: ScreenUtil().setSp(20),
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 5,
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.book,
+                                    color: Colors.grey[600],
+                                    size: 24,
+                                  ),
+                                  const SizedBox(width: 16),
+                                  CustomFont(
+                                    text: 'National University Manila',
+                                    fontSize: ScreenUtil().setSp(15),
+                                    color: Colors.black87,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 5,
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.cake,
+                                    color: Colors.grey[600],
+                                    size: 24,
+                                  ),
+                                  const SizedBox(width: 16),
+                                  CustomFont(
+                                    text: 'August 11, 2004',
+                                    fontSize: ScreenUtil().setSp(15),
+                                    color: Colors.black87,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 5,
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.work,
+                                    color: Colors.grey[600],
+                                    size: 24,
+                                  ),
+                                  const SizedBox(width: 16),
+                                  CustomFont(
+                                    text: 'Youtube, NASA, SpaceX, Tesla',
+                                    fontSize: ScreenUtil().setSp(15),
+                                    color: Colors.black87,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 5,
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.more_horiz,
+                                    color: Colors.grey[600],
+                                    size: 24,
+                                  ),
+                                  const SizedBox(width: 16),
+                                  CustomFont(
+                                    text: 'See $displayName\'s About info',
+                                    fontSize: ScreenUtil().setSp(15),
+                                    color: Colors.black87,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+                        ),
+                      ],
+                    ),
+                    
+                    GridView.count(
+                      primary: false,
+                      padding: const EdgeInsets.all(5),
+                      crossAxisSpacing: 5,
+                      mainAxisSpacing: 5,
+                      crossAxisCount: 3,
+                      children: [
+                        SizedBox(
+                          height: 100,
+                          width: 100,
+                          child: Image.asset(
+                            'assets/images/cat.jpg',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 100,
+                          width: 100,
+                          child: Image.asset(
+                            'assets/images/owl.jpg',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 100,
+                          width: 100,
+                          child: Image.asset(
+                            'assets/images/binimikha.jpg',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 100,
+                          width: 100,
+                          child: Image.asset(
+                            'assets/images/JosePost.jpg',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 100,
+                          width: 100,
+                          child: Image.asset(
+                            'assets/images/golden.jpg',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -191,125 +437,4 @@ final String coverImageUrl = 'assets/images/JosePost.jpg';
       ),
     );
   }
-
-  // Enhancement 3: Build Posts Section 
-  Widget _buildPostsSection() {
-    return ListView(
-      padding: EdgeInsets.all(ScreenUtil().setWidth(10)),
-      children: [
-        PostCard(
-          userName: profileName,
-          date: '2h ago',
-          postContent: 'lodi ko yan',
-          numOfLikes: 245,
-          hasImage: true,
-        ),
-        PostCard(
-          userName: profileName,
-          date: '5h ago',
-          postContent: 'my love belongs to you',
-          numOfLikes: 189,
-          hasImage: false,
-        ),
-        PostCard(
-          userName: profileName,
-          date: '1d ago',
-          postContent: 'ah ganun ba,, gege.',
-          numOfLikes: 312,
-          hasImage: true,
-        ),
-        PostCard(
-          userName: profileName,
-          date: '2d ago',
-          postContent: 'zgzg',
-          numOfLikes: 156,
-          hasImage: false,
-        ),
-        PostCard(
-          userName: profileName,
-          date: '3d ago',
-          postContent: 'lalaland',
-          numOfLikes: 421,
-          hasImage: true,
-        ),
-      ],
-    );
-  }
-
-  // Enhancement 4: Build About Section with profile information
-  Widget _buildAboutSection() {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(ScreenUtil().setWidth(20)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildAboutItem(Icons.school, 'Studies at', 'National University - Manila'),
-          _buildAboutItem(Icons.home, 'Lives in', 'Navotas City, Metro Manila'),
-          _buildAboutItem(Icons.location_on, 'From', 'Philippines'),
-          _buildAboutItem(Icons.favorite, 'Relationship', 'Taken'),
-          _buildAboutItem(Icons.cake, 'Birthday', 'March 2, 2004'),
-          SizedBox(height: ScreenUtil().setHeight(20)),
-          ]),
-      );
-  }
-
-  Widget _buildAboutItem(IconData icon, String label, String value) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: ScreenUtil().setHeight(15)),
-      child: Row(
-        children: [
-          Icon(icon, size: ScreenUtil().setSp(24), color: Colors.grey[700]),
-          SizedBox(width: ScreenUtil().setWidth(15)),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomFont(
-                text: label,
-                fontSize: ScreenUtil().setSp(12),
-                color: Colors.grey,
-              ),
-              CustomFont(
-                text: value,
-                fontSize: ScreenUtil().setSp(14),
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Enhancement 5: 
- Widget _buildPhotosSection() {
-  final List<String> photoUrls = List.generate(
-    6,
-    (index) => 'assets/images/TupeDP.jpg',
-  );
-
-  return GridView.builder(
-    shrinkWrap: true,
-    physics: const NeverScrollableScrollPhysics(),
-    
-    padding: EdgeInsets.all(ScreenUtil().setWidth(10)),
-    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 3,
-      crossAxisSpacing: ScreenUtil().setWidth(5),
-      mainAxisSpacing: ScreenUtil().setHeight(5),
-    ),
-    itemCount: photoUrls.length,
-    itemBuilder: (context, index) {
-      return Container(
-        decoration: BoxDecoration(
-          color: Colors.grey[300],
-          image: DecorationImage(
-            image: AssetImage(photoUrls[index]), 
-            fit: BoxFit.cover,
-          ),
-          borderRadius: BorderRadius.circular(8), 
-        ),
-      );
-    },
-  );
-}}
+}
